@@ -1,0 +1,1201 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <title>Creating a Prometric ID</title>  
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="Content/bootstrap-icons-1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/bootstrap.min.v5.3.0.css" rel="stylesheet">
+  <link href="css/style_pr_responsive.css" rel="stylesheet">
+  <style>
+    :root {
+      /* Color & base */
+      --fg: #14171a;
+      --bg: #fafafa;
+      --card: #fff;
+      --line: #e5e7eb;
+      --focus: #ffa702;
+      --ok: #1b5e20;
+      --warn: #8a4b00;
+      --err: #b00020;
+      --mono: ui-monospace,"JetBrains Mono","Roboto Mono",monospace;
+      --keypad-bg: #eef6ff;
+      --progress-start: #2e7d32;
+      --progress-end: #66bb6a;
+      --input-border: #b7dcff;
+      --input-font-size: 18px; /* base */
+      --mrz-letter-spacing: 2.35px; /* normal tracking */
+      --sample-pre-font-size: 14px;
+      --sample-code-font-size: 20px;
+      --sample-code-letter-spacing: 2.35px;
+      --sample-note-font-size: 11px;
+  --key-min-height: 40px; /* keypad key base height */
+  --error-slot-min-height: 60px; /* reserve space for per-line errors (approx 3 lines) */
+  --key-min-height: 40px; /* keypad key base height */
+  /* Keypad toggle responsive vars */
+  --keypad-switch-font-size:14px;
+  --keypad-switch-scale:1;
+  --keypad-switch-track-width:42px;
+  /* Count badge base size */
+  --count-font-size:13px;
+  --count-padding-y:2px;
+  --count-padding-x:10px;
+  --keypad-switch-track-height:24px;
+  /* Label title base size */
+  --label-title-font-size:17px;
+  /* Validate button sizing vars */
+  --check-btn-font-size:12px;
+  --check-btn-padding-y:6px;
+  --check-btn-padding-x:12px;
+  --check-btn-radius:8px;
+    }
+
+    /* Layout resets */
+    * { box-sizing: border-box; }
+    h1 {
+      font-size: 20px;
+      margin: 8px 0 12px;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      /*border: 1px solid var(--line);*/
+      /*border-radius: 14px;*/
+      padding: 12px;
+    }
+    @media (min-width:720px) { .card { padding:16px; } }
+
+    /* Labels & counters */
+    label {
+      display:flex;
+      justify-content:flex-start; /* button stays directly right of label title */
+      gap:8px;
+      font-size:14px;
+      color:#555;
+      margin:10px 0 6px;
+    }
+    label .countwrap { margin-left:auto; } /* push counter group to far right */
+    .count {
+  font-size:var(--count-font-size);
+  font-family:var(--mono);
+  background:#eef2ff;
+  color:#1e3a8a;
+  padding:var(--count-padding-y) var(--count-padding-x);
+  border-radius:999px;
+  line-height:1;
+  display:inline-block;
+  min-width:80px;
+  text-align:center;
+  letter-spacing:.5px;
+  transition:background .25s,color .25s;
+    }
+  /* Responsive count scaling */
+  @media (min-width:480px){ :root { --count-font-size:14px; --count-padding-y:3px; --count-padding-x:12px; } }
+  @media (min-width:640px){ :root { --count-font-size:15px; --count-padding-y:4px; --count-padding-x:14px; } }
+  @media (min-width:840px){ :root { --count-font-size:16px; --count-padding-y:5px; --count-padding-x:16px; } }
+  @media (min-width:1024px){ :root { --count-font-size:17px; --count-padding-y:6px; --count-padding-x:18px; } }
+  @media (min-width:1280px){ :root { --count-font-size:18px; --count-padding-y:7px; --count-padding-x:20px; } }
+    .count.near {
+      background:#fff8e1;
+      color:var(--warn);
+    }
+    .count.complete {
+      background:#e8f5e9;
+      color:var(--ok);
+    }
+    .progressline {
+      height:4px;
+      background:#e5e7eb;
+      border-radius:2px;
+      overflow:hidden;
+      margin:4px 0 2px;
+    }
+    .progressline span {
+      display:block;
+      height:100%;
+      width:0;
+      background:linear-gradient(90deg,var(--progress-start),var(--progress-end));
+      transition:width .25s;
+    }
+    .badge-state {
+      display:none;
+      font-size:11px;
+      font-family:var(--mono);
+      padding:3px 8px;
+      border-radius:999px;
+      font-weight:600;
+      line-height:1;
+      letter-spacing:.5px;
+      border:1px solid transparent;
+    }
+    .badge-valid {
+      background:#e8f5e9;
+      color:var(--ok);
+      border-color:#c8e6c9;
+    }
+    .badge-error {
+      background:#ffebee;
+      color:var(--err);
+      border-color:#ffcdd2;
+    }
+    .badge-state.show { display:inline-block; }
+    .countwrap {
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .label-title {
+      font-weight:600;
+      color:#000;
+      font-size:var(--label-title-font-size);
+    }
+    /* Responsive label title scaling */
+    @media (min-width:480px){ :root { --label-title-font-size:17px; } }
+    @media (min-width:640px){ :root { --label-title-font-size:19px; } }
+    @media (min-width:840px){ :root { --label-title-font-size:21px; } }
+    @media (min-width:1024px){ :root { --label-title-font-size:23px; } }
+    @media (min-width:1280px){ :root { --label-title-font-size:25px; } }
+
+    /* Input area */
+    .guideline { position:relative; }
+    input[type=text] {
+      width:100%;
+      padding:3px 12px;
+      border:3px solid var(--input-border);
+      border-radius:10px;
+      font-size:var(--input-font-size);
+      background:#fff;
+    }
+    input.mono {
+      font-family:var(--mono);
+      font-variant-numeric:slashed-zero;
+      letter-spacing:var(--mrz-letter-spacing);
+    }
+  .mrz-line { padding-right:42px; }
+    input:focus {
+      outline:none;
+      border-color:var(--focus);
+      box-shadow:0 0 2px 4px rgb(245, 202, 60);
+    }
+    .guideline::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      border-radius:10px;
+      display:none;
+    }
+  .valid-large{display:none;width:30px;height:30px;margin-left:8px;display:inline-flex;align-items:center;justify-content:center;}
+  .valid-large.show{display:inline-flex;}
+
+    .row {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+    }
+
+    /* Actions */
+    .actions {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-top:10px;
+      justify-content:flex-end; /* push contents to right */
+    }
+  #keypadSwitchWrap { margin-left:auto; display:flex; align-items:center; gap:8px; }
+  #keypadSwitchWrap .form-check-label { font-size:var(--keypad-switch-font-size); font-weight:600; user-select:none; margin-left: 10px;}
+  #keypadSwitchWrap .form-check-input {
+    width:var(--keypad-switch-track-width);
+    height:var(--keypad-switch-track-height);
+    margin:0; /* remove bootstrap default negative margin for switch */
+    transform:scale(var(--keypad-switch-scale));
+    transform-origin:left center;
+    cursor:pointer;
+  }
+  #keypadSwitchWrap .form-check-input:focus { box-shadow:0 0 0 .25rem rgba(255,167,2,.35); }
+  /* Increase hit area on very small screens */
+  @media (max-width:399px){
+    :root { --keypad-switch-track-width:48px; --keypad-switch-track-height:26px; }
+  }
+  @media (min-width:480px){
+    :root { --keypad-switch-font-size:15px; --keypad-switch-scale:1.06; }
+  }
+  @media (min-width:640px){
+    :root { --keypad-switch-font-size:16px; --keypad-switch-scale:1.12; }
+  }
+  @media (min-width:840px){
+    :root { --keypad-switch-font-size:16px; --keypad-switch-scale:1.16; }
+  }
+  @media (min-width:1024px){
+    :root { --keypad-switch-font-size:17px; --keypad-switch-scale:1.20; }
+  }
+  @media (min-width:1280px){
+    :root { --keypad-switch-font-size:18px; --keypad-switch-scale:1.25; }
+  }
+    .btn {
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .btn.primary {
+      background:#1d4ed8;
+      border-color:#1d4ed8;
+      color:#fff;
+    }
+    .btn:active { transform:translateY(1px); }
+    .tiny {
+      font-size:12px;
+      color:#666;
+    }
+
+    /* Status */
+    .status {
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:10px;
+      font-size:14px;
+      border:1px solid var(--line);
+    }
+    .ok {
+      background:#e8f5e9;
+      color:var(--ok);
+      border-color:#c8e6c9;
+    }
+    .warn {
+      background:#fff8e1;
+      color:var(--warn);
+      border-color:#ffe0b2;
+    }
+    .err {
+      background:#ffebee;
+      color:var(--err);
+      border-color:#ffcdd2;
+    }
+    .errorlist {
+      margin:10px 0 0;
+      padding:10px 0 10px 24px;
+    }
+    /* Reserved error area (min-height to prevent keypad jump) */
+    .tiny.err {
+      display:block;
+      /* remove inherited red background until errors exist */
+      background:transparent;
+      border:none;
+      padding:0;
+    }
+    .tiny.err:not(:empty) {
+      background:#ffebee;
+      /*border:1px solid #ffcdd2;*/
+      /*border-radius:8px;*/
+      padding:6px 8px;
+      margin: 5px 0;
+    }
+  .tiny.err:empty { visibility:hidden; }
+    .tiny.err ul.errorlist {
+      margin:0;
+      padding:0 0 0 20px;
+    }
+    .errorRow {
+      position:relative;
+      display:block;
+      /* min-height removed per request; area collapses when empty */
+      /* padding-right removed (Clear button moved to actionRow) */
+    }
+    .btn-clear-line {
+      position:absolute;
+      top:6px;
+      right:0;
+      padding:6px 12px;
+      font-size:12px;
+      border-radius:8px;
+      background:linear-gradient(#fff5f5,#ffe4e6);
+      border:1px solid #fecdd3;
+      color:#b91c1c;
+      font-weight:600;
+    }
+    .btn-clear-line:hover { background:linear-gradient(#fff1f2,#ffd9de); }
+    .btn-clear-line:active { background:#fecdd3; }
+    .btn-check-line {
+  padding:var(--check-btn-padding-y) var(--check-btn-padding-x);
+  font-size:var(--check-btn-font-size);
+      line-height:1.1;
+  border-radius:var(--check-btn-radius);
+      border:1px solid var(--line);
+      background:#fff;
+      cursor:pointer;
+      transition:background .18s,border-color .18s,color .18s;
+    }
+  /* Row for validate + clear buttons */
+  .actionRow{display:flex;align-items:center;gap:12px;margin-top:6px;}
+  .actionRow .btn-clear-line{position:static;margin-left:auto;top:auto;right:auto;}
+    .btn-check-line:disabled { opacity:.45; cursor:not-allowed; }
+  .btn-check-line:not(:disabled) { background:#166534; border-color:#166534; color:#fff; }
+  .btn-check-line:not(:disabled):hover { background:#14532d; border-color:#14532d; color:#fff; }
+  .btn-check-line:not(:disabled):active { background:#0f3f22; border-color:#0f3f22; color:#fff; }
+  /* Responsive sizing for validate buttons */
+  @media (min-width:480px){ :root { --check-btn-font-size:13px; --check-btn-padding-y:7px; --check-btn-padding-x:14px; } }
+  @media (min-width:640px){ :root { --check-btn-font-size:14px; --check-btn-padding-y:8px; --check-btn-padding-x:16px; } }
+  @media (min-width:840px){ :root { --check-btn-font-size:15px; --check-btn-padding-y:9px; --check-btn-padding-x:18px; --check-btn-radius:9px; } }
+  @media (min-width:1024px){ :root { --check-btn-font-size:15.5px; --check-btn-padding-y:10px; --check-btn-padding-x:20px; --check-btn-radius:10px; } }
+  @media (min-width:1280px){ :root { --check-btn-font-size:16px; --check-btn-padding-y:11px; --check-btn-padding-x:22px; --check-btn-radius:11px; } }
+
+    /* Error list overrides (local) */
+    .tiny.err .errorlist {
+      list-style:disc;
+      margin:0;
+      padding:0 0 0 18px; /* indent bullets */
+      font-size:12px;
+      color:var(--err);
+      line-height:1.35;
+    }
+    .tiny.err .errorlist li {
+      margin:2px 0;
+      padding:0;
+      list-style:disc;
+      word-break:break-word;
+    }
+    /* When validation passes, ensure empty container stays hidden but space reserved */
+    .tiny.err:empty { visibility:hidden; }
+
+    /* Keypad */
+    .keypad {
+      position:sticky;
+      bottom:0;
+      background:var(--keypad-bg);
+      border:1px solid var(--line);
+      border-radius:0;
+      padding:4px;
+      margin-top:12px;
+      box-shadow:none;
+      z-index:10;
+      transition:transform .28s ease, opacity .28s ease;
+    }
+    .keypad.hide {
+      pointer-events:none;
+      opacity:0;
+      transform:translateY(12px);
+    }
+    .keys {
+      display:grid;
+      grid-template-columns:repeat(10,1fr);
+      gap:0;
+    }
+    .break {
+      grid-column:1 / -1;
+      height:0;
+    }
+    .key {
+      min-height:var(--key-min-height);
+      border:1px solid var(--line);
+      border-radius:0;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:var(--mono);
+      font-size:18px;
+      font-weight:500;
+      user-select:none;
+      cursor:pointer;
+      touch-action:manipulation;
+      position:relative;
+      box-shadow:none;
+      transition:background .12s;
+    }
+    .key:hover { background:#f1f5f9; }
+    .key:active { background:#e2e8f0; }
+    .key:focus-visible {
+      outline:2px solid var(--focus);
+      outline-offset:2px;
+    }
+    .key[data-action] {
+      font-size:14px;
+      font-weight:600;
+      letter-spacing:.5px;
+    }
+  .key[data-action=clearL1], .key[data-action=clearL2], .key[data-action=back] {
+      background:linear-gradient(#fff5f5,#ffe4e6);
+      border-color:#fecdd3;
+      color:#b91c1c;
+    }
+  .key[data-action=clearL1]:hover, .key[data-action=clearL2]:hover, .key[data-action=back]:hover {
+      background:linear-gradient(#fff1f2,#ffd9de);
+    }
+  .key[data-action=clearL1]:active, .key[data-action=clearL2]:active, .key[data-action=back]:active {
+      background:#fecdd3;
+    }
+    .key[data-action=fillpad] {
+      background:linear-gradient(#e8f5e9,#d0f1d4);
+      border-color:#b2e2b8;
+      color:#1b5e20;
+    }
+    .key[data-action=fillpad]:hover {
+      background:linear-gradient(#e1f3e3,#c4eac9);
+    }
+    .key[data-action=fillpad]:active { background:#b2e2b8; }
+    .key[data-action=lt] {
+      background:linear-gradient(#e8f5e9,#d0f1d4);
+      border-color:#b2e2b8;
+      color:#1b5e20;
+    }
+    .key[data-action=lt]:hover { background:linear-gradient(#e1f3e3,#c4eac9); }
+    .key[data-action=lt]:active { background:#b2e2b8; }
+    .key[data-action=clear] {
+      background:linear-gradient(#fefce8,#fef9c3);
+      border-color:#fde68a;
+      color:#92400e;
+    }
+    .key[data-action=clear]:hover {
+      background:linear-gradient(#fef9d8,#fef3a8);
+    }
+    .key[data-action=clear]:active { background:#fde68a; }
+    @media (hover:none) { .key:hover { background:linear-gradient(#ffffff,#f8fafc); } }
+  /* Bootstrap Icons (inline SVG) サイズ調整 */
+  .key svg.bi { width:1.4em; height:1.4em; display:block; }
+  .key--span2 { grid-column:span 2; }
+  .key--span3 { grid-column:span 3; }
+  .key--span4 { grid-column:span 4; }
+  .key--span10 { grid-column:1 / -1; }
+  .key.wide { grid-column:span 2; }
+  .key.widewide { grid-column:span 4; }
+
+    /* Sample box */
+    .sample-box {
+      margin-top:0;
+      /*padding:12px;*/
+      /*border:1px dashed var(--line);*/
+      /*border-radius:12px;*/
+      /*background:#f0f8ff;*/
+      font-size:13px;
+      color:#1e3a8a;
+    }
+    .sample-box h2 {
+      margin:0 0 6px;
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.5px;
+      color:#1e3a8a;
+    }
+    .sample-box__head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .sample-box__head .btn {
+      padding:6px 10px;
+      font-size:12px;
+      line-height:1;
+      border-radius:8px;
+    }
+    .sample-note {
+      margin:4px 0 4px 0;
+      font-size:var(--sample-note-font-size);
+      color:#475569;
+      line-height: 0.9rem;
+    }
+    .monobox {
+      font-family:var(--mono);
+      font-variant-numeric:slashed-zero;
+      background:#0f172a;
+      color:#e2e8f0;
+      border:1px solid #1e293b;
+      border-radius:10px;
+      padding:10px 12px;
+      white-space:pre;
+      overflow-x:auto;
+      margin-top:8px;
+    }
+    .sample-box pre {
+      margin:6px 0; font:var(--sample-pre-font-size)/1.15 var(--mono); background:#0f172a; color:#e2e8f0;
+      padding:10px 12px; border-radius:10px; overflow-x:auto;
+    }
+    .sample-box code {
+      display:block;
+      white-space:pre;
+      font-family:var(--mono);
+      font-size:var(--sample-code-font-size);
+      letter-spacing:var(--sample-code-letter-spacing);
+      min-width:44ch;
+    }
+    /* Moved sampleBoxBody (no longer inside .sample-box) needs its own styling */
+    #sampleBoxBody pre {
+      margin:6px 0; font:var(--sample-pre-font-size)/1.15 var(--mono); background:#0f172a; color:#e2e8f0;
+      padding:10px 12px; border-radius:10px; overflow-x:auto;
+    }
+    #sampleBoxBody code { display:block; white-space:pre; font-family:var(--mono); font-size:var(--sample-code-font-size); letter-spacing:var(--sample-code-letter-spacing); min-width:44ch; }
+    /* Line2 sample styling */
+    #sampleBoxBody2 pre {
+      margin:6px 0; font:var(--sample-pre-font-size)/1.15 var(--mono); background:#0f172a; color:#e2e8f0;
+      padding:10px 12px; border-radius:10px; overflow-x:auto;
+    }
+    #sampleBoxBody2 code { display:block; white-space:pre; font-family:var(--mono); font-size:var(--sample-code-font-size); letter-spacing:var(--sample-code-letter-spacing); min-width:44ch; }
+
+    /* Media queries: inputs & sample scaling */
+  @media (max-width:599px) { :root { --input-font-size:16px; --sample-note-font-size:10.5px; --sample-code-font-size:13px; --sample-code-letter-spacing:.25px; --key-min-height:44px; --error-slot-min-height:52px; } }
+  @media (max-width:430px) { :root { --input-font-size:15px; --mrz-letter-spacing:0; --sample-code-font-size:13px; --sample-code-letter-spacing:0; --sample-note-font-size:10px; --key-min-height:46px; --error-slot-min-height:50px; } input[type=text]{padding:10px 6px;} }
+  @media (max-width:380px) { :root { --input-font-size:13px; --mrz-letter-spacing:0; --sample-code-font-size:13px; --sample-code-letter-spacing:0; --sample-note-font-size:9.5px; --key-min-height:36px; --error-slot-min-height:48px; } input[type=text]{padding:8px 4px;} }
+  @media (min-width:600px) { :root { --input-font-size:20px; --key-min-height:42px; --error-slot-min-height:60px; } }
+  @media (min-width:900px) { :root { --input-font-size:24px; --sample-pre-font-size:20px; --sample-code-font-size:20px; --sample-code-letter-spacing:4px; --sample-note-font-size:12px; --key-min-height:40px; --error-slot-min-height:72px; } .sample-box pre{padding:12px 14px;} }
+    @media (prefers-reduced-motion:reduce) { .btn:active, .key:active { transform:none; } }
+  </style>
+</head>
+<body>
+    <div class="container-fluid custom-header">
+    <div class="container d-flex">
+      <img src="Content/images/prometric_logo.svg" alt="Prometricのロゴ" class="custom-header-logo" />
+    </div>
+  </div>
+  <div class="title-default-block">
+    <h1>Creating a Prometric ID</h1>
+  </div>
+  <div class="container-fluid page-wrapper">
+    <h3 class="mb-0">Enter your passport MRZ.</h3>
+    <section aria-labelledby="mrz-title">
+      <div class="row">
+        <div>
+          <label for="line1"><span class="label-title">MRZ Line 1</span> <button type="button" class="btn" id="toggleSample" aria-controls="sampleBoxBody" aria-expanded="false" style="padding:6px 10px;font-size:12px;line-height:1;border-radius:8px;background:#f1f5f9;">Show sample</button> <span class="countwrap"><span id="l1valid" class="badge-state badge-valid" aria-hidden="true">VALID</span><span id="l1count" class="count">0 / 44</span></span></label>
+        <div id="sampleBoxBody" hidden aria-hidden="true">
+          <pre><code id="sampleL1">P&lt;JPNSHIKEN&lt;&lt;TARO&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code></pre>
+          <p class="sample-note">This is a sample. Enter your passport MRZ.</p>
+        </div>
+          <div class="guideline"><input id="line1" class="mono mrz-line" type="text" inputmode="latin" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="44"></div>
+          <div class="progressline" aria-hidden="true"><span id="l1bar"></span></div>
+          <!-- Doc code is 2 chars (help text) — temporarily hidden -->
+          <div class="actionRow"><button type="button" id="checkL1Btn" class="btn btn-check-line" aria-label="Line 1 を検証">Validate Line 1</button><span id="l1ok" class="valid-large" aria-hidden="true"></span><button type="button" id="clearL1Btn" class="btn btn-clear-line" aria-label="Line 1 をクリア">Clear</button></div>
+          <div class="errorRow"><div id="errLine1" class="tiny err"></div></div>
+        </div>
+        <div>
+          <label for="line2"><span class="label-title">MRZ Line 2</span> <button type="button" class="btn" id="toggleSample2" aria-controls="sampleBoxBody2" aria-expanded="false" style="padding:6px 10px;font-size:12px;line-height:1;border-radius:8px;background:#f1f5f9;">Show sample</button> <span class="countwrap"><span id="l2valid" class="badge-state badge-valid" aria-hidden="true">VALID</span><span id="l2count" class="count">0 / 44</span></span></label>
+        <div id="sampleBoxBody2" hidden aria-hidden="true">
+          <pre><code id="sampleL2">AB12345671JPN0010263M3509010&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;06</code></pre>
+          <p class="sample-note">This is a sample. Enter your passport MRZ.</p>
+        </div>
+          <div class="guideline"><input id="line2" class="mono mrz-line" type="text" inputmode="latin" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="44"></div>
+          <div class="progressline" aria-hidden="true"><span id="l2bar"></span></div>
+          <!-- Checks: passport no., DOB, expiry, optional, final. — temporarily hidden -->
+          <div class="actionRow"><button type="button" id="checkL2Btn" class="btn btn-check-line" aria-label="Line 2 を検証">Validate Line 2</button><span id="l2ok" class="valid-large" aria-hidden="true"></span><button type="button" id="clearL2Btn" class="btn btn-clear-line" aria-label="Line 2 をクリア">Clear</button></div>
+          <div class="errorRow"><div id="errLine2" class="tiny err"></div></div>
+        </div>
+      </div>
+
+  <div class="actions">
+  <div class="form-check form-switch ms-auto" id="keypadSwitchWrap">
+    <input class="form-check-input" type="checkbox" role="switch" id="toggleKeypad" aria-label="キーパッド切替">
+    <label class="form-check-label" for="toggleKeypad">Keypad</label>
+  </div>
+  </div>
+
+      <!--<div id="statusA" class="status warn" role="status" aria-live="polite">Waiting for input…</div>-->
+
+      <div class="keypad" aria-label="MRZ keypad">
+        <div class="keys" id="keypad"></div>
+      </div>
+    </section>
+
+        <div class="d-flex justify-content-between margin-t-large">
+      <button class="btn btn-secondary wid-180 me-5" type="button" onclick="history.back()"><i
+          class="bi bi-caret-left-fill"></i>Return</button>
+      <button class="btn btn-primary wid-180" type="button" onclick="window.location.href='サンプル_ID取得_IdEngInfo_JLFW.html'">Next <i
+          class="bi bi-caret-right-fill"></i>
+      </button>
+    </div>
+
+      <div class="container-fluid custom-footer">
+    <footer>
+      <p class="copyright-text">&copy; Prometric, ALL RIGHTS RESERVED.</p>
+    </footer>
+  </div>
+  <script src="Content/js/bootstrap.bundle.min.v5.3.0.js"></script>
+  </div>
+
+  <script>
+    // ===== Utilities =====
+    const W=[7,3,1];
+    const mapVal = ch => ch==='<'?0 : (ch>='0'&&ch<='9')? ch.charCodeAt(0)-48 : (ch>='A'&&ch<='Z')? ch.charCodeAt(0)-55 : NaN;
+    function checkDigit(str){ let s=0; for(let i=0;i<str.length;i++){ const v=mapVal(str[i]); if(Number.isNaN(v)) return null; s+=v*W[i%3]; } return String(s%10); }
+    function normalizeMRZ(s){ if(!s) return ''; const nfkc=s.normalize('NFKC'); const mapped=nfkc.replace(/[Ａ-Ｚａ-ｚ０-９＜]/g, ch=>{ const c=ch.charCodeAt(0); if(c>=0xFF21&&c<=0xFF3A) return String.fromCharCode(c-0xFF21+65); if(c>=0xFF41&&c<=0xFF5A) return String.fromCharCode(c-0xFF41+65); if(c>=0xFF10&&c<=0xFF19) return String.fromCharCode(c-0xFF10+48); if(c===0xFF1C) return '<'; return ch; }).toUpperCase().replace(/[^A-Z0-9\n<]/g,''); return mapped; }
+    function setCount(el,elCnt,bar){
+      const used=el.value.length;
+      elCnt.textContent = `${used} / 44`;
+      if(bar){ bar.style.width = (used/44*100)+'%'; }
+      elCnt.classList.toggle('complete', used===44);
+      elCnt.classList.toggle('near', used>=30 && used<44);
+    }
+
+    // per-line validation (with optional length suppression)
+    function validateTD3(line1,line2,{suppressLengthErrors=false}={}){
+      const errs1=[], errs2=[];
+      const re44=/^[A-Z0-9<]{44}$/;
+      if(!suppressLengthErrors){
+        if(!re44.test(line1)) errs1.push('Line 1 must be 44 chars [A–Z, 0–9, <].');
+        if(!re44.test(line2)) errs2.push('Line 2 must be 44 chars [A–Z, 0–9, <].');
+      }
+      if((!re44.test(line1) || !re44.test(line2)) && suppressLengthErrors){
+        // 片方のみ完成している場合は、その完成行の構造チェックだけ実施
+        if(re44.test(line1)){
+          const docCode=line1.slice(0,2);
+          if(docCode[0]!== 'P') errs1.push('Expected doc code starting with "P".');
+          if(!/[A-Z<]/.test(docCode[1])) errs1.push('Second char should be "<" or A–Z.');
+        }
+        if(re44.test(line2)){
+          const passNum=line2.slice(0,9), cdPass=line2[9];
+          const nat=line2.slice(10,13);
+          const dob=line2.slice(13,19), cdDob=line2[19];
+          const sex=line2[20];
+          const exp=line2.slice(21,27), cdExp=line2[27];
+          const opt=line2.slice(28,43), cdFinal=line2[43];
+          if(checkDigit(passNum)!==cdPass) errs2.push('Passport# check digit mismatch.');
+          if(checkDigit(dob)!==cdDob) errs2.push('DOB check digit mismatch.');
+          if(checkDigit(exp)!==cdExp) errs2.push('Expiry check digit mismatch.');
+          const finalSrc=passNum+cdPass+dob+cdDob+exp+cdExp+opt;
+          if(checkDigit(finalSrc)!==cdFinal) errs2.push('Final check digit mismatch.');
+          if(!/^[A-Z]{3}$/.test(nat)) errs2.push('Nationality must be A–Z (3).');
+          if(!/^[MFX<]$/.test(sex)) errs2.push('Sex must be M/F/X or <.');
+        }
+        return { ok: errs1.length===0 && errs2.length===0, errs1, errs2 };
+      }
+      // 両方とも 44 桁揃っている場合のフル構造チェック
+      const docCode=line1.slice(0,2);
+      if(docCode[0]!== 'P') errs1.push('Expected doc code starting with "P".');
+      if(!/[A-Z<]/.test(docCode[1])) errs1.push('Second char should be "<" or A–Z.');
+      const passNum=line2.slice(0,9), cdPass=line2[9];
+      const nat=line2.slice(10,13);
+      const dob=line2.slice(13,19), cdDob=line2[19];
+      const sex=line2[20];
+      const exp=line2.slice(21,27), cdExp=line2[27];
+      const opt=line2.slice(28,43), cdFinal=line2[43];
+      if(checkDigit(passNum)!==cdPass) errs2.push('Passport# check digit mismatch.');
+      if(checkDigit(dob)!==cdDob) errs2.push('DOB check digit mismatch.');
+      if(checkDigit(exp)!==cdExp) errs2.push('Expiry check digit mismatch.');
+      const finalSrc=passNum+cdPass+dob+cdDob+exp+cdExp+opt;
+      if(checkDigit(finalSrc)!==cdFinal) errs2.push('Final check digit mismatch.');
+      if(!/^[A-Z]{3}$/.test(nat)) errs2.push('Nationality must be A–Z (3).');
+      if(!/^[MFX<]$/.test(sex)) errs2.push('Sex must be M/F/X or <.');
+      return { ok: errs1.length===0 && errs2.length===0, errs1, errs2 };
+    }
+
+    // 単独行用の軽量バリデーション（もう一方が未入力のときのみ使用）
+    function validateLine1Only(line1,{suppressLengthErrors=false}={}){
+      const errs=[]; const re44=/^[A-Z0-9<]{44}$/;
+      if(!suppressLengthErrors && line1.length>0 && !re44.test(line1)) errs.push('Line 1 must be 44 chars [A–Z, 0–9, <].');
+      if(line1.length>=2){
+        const docCode=line1.slice(0,2);
+        if(docCode[0]!== 'P') errs.push('Expected doc code starting with "P".');
+        if(!/[A-Z<]/.test(docCode[1])) errs.push('Second char should be "<" or A–Z.');
+      }
+      return errs;
+    }
+    function validateLine2Only(line2,{suppressLengthErrors=false}={}){
+      const errs=[]; const re44=/^[A-Z0-9<]{44}$/;
+      if(!suppressLengthErrors && line2.length>0 && !re44.test(line2)) errs.push('Line 2 must be 44 chars [A–Z, 0–9, <].');
+      // Line2 の構造的チェックは 44 桁揃ってから（未完成時はノイズになるため抑制）
+      if(line2.length===44){
+        const passNum=line2.slice(0,9), cdPass=line2[9];
+        const nat=line2.slice(10,13);
+        const dob=line2.slice(13,19), cdDob=line2[19];
+        const sex=line2[20];
+        const exp=line2.slice(21,27), cdExp=line2[27];
+        const opt=line2.slice(28,43), cdFinal=line2[43];
+        if(checkDigit(passNum)!==cdPass) errs.push('Passport# check digit mismatch.');
+        if(checkDigit(dob)!==cdDob) errs.push('DOB check digit mismatch.');
+        if(checkDigit(exp)!==cdExp) errs.push('Expiry check digit mismatch.');
+        const finalSrc=passNum+cdPass+dob+cdDob+exp+cdExp+opt;
+        if(checkDigit(finalSrc)!==cdFinal) errs.push('Final check digit mismatch.');
+        if(!/^[A-Z]{3}$/.test(nat)) errs.push('Nationality must be A–Z (3).');
+        if(!/^[MFX<]$/.test(sex)) errs.push('Sex must be M/F/X or <.');
+      }
+      return errs;
+    }
+
+    // ===== DOM refs =====
+    const line1=document.getElementById('line1');
+    const line2=document.getElementById('line2');
+    const l1count=document.getElementById('l1count');
+  const l2count=document.getElementById('l2count');
+  const l1bar=document.getElementById('l1bar');
+  const l2bar=document.getElementById('l2bar');
+    const statusA=document.getElementById('statusA');
+    const errLine1=document.getElementById('errLine1');
+  const errLine2=document.getElementById('errLine2');
+  const l1valid=document.getElementById('l1valid');
+    const l2valid=document.getElementById('l2valid');
+    function resetBadges(){
+      [l1valid,l2valid].forEach(el=>{ if(!el) return; el.classList.remove('show','badge-error'); el.classList.add('badge-valid'); el.textContent='VALID'; });
+    }
+  const bigIcon=(ok)=> ok?'<i class="bi bi-check-circle-fill" style="color:#16a34a;font-size:24px" aria-hidden="true"></i>':'<i class="bi bi-exclamation-circle-fill" style="color:#dc2626;font-size:24px" aria-hidden="true"></i>';
+    function showBadge(el,type){
+      if(!el) return;
+      const large = el.id==='l1valid'? document.getElementById('l1ok'): document.getElementById('l2ok');
+      if(type==='valid'){
+        if(large){ large.innerHTML=bigIcon(true); large.classList.add('show'); }
+        el.classList.remove('show');
+      } else {
+        if(large){ large.innerHTML=bigIcon(false); large.classList.add('show'); }
+        el.classList.remove('show');
+      }
+    }
+
+    // Track last-focused field so keypad knows where to type
+    let currentField=line1;
+    line1.addEventListener('focus',()=>{ currentField=line1; });
+    line2.addEventListener('focus',()=>{ currentField=line2; });
+
+    // formatting + validation driver
+    // IME 中は正規化を遅延し、終了時のみ実施 (全角英数での重複/キャレット飛び防止)
+    function clean(el){
+      const start = el.selectionStart ?? el.value.length;
+      const beforeLen = el.value.length;
+      const norm = normalizeMRZ(el.value).replace(/\n/g,'').slice(0,44);
+      el.value = norm;
+      // 粗いキャレット補正 (長さ差分を考慮)。末尾飛びを防ぐ。
+      const delta = el.value.length - beforeLen;
+      const pos = Math.max(0, Math.min(el.value.length, start + delta));
+      try{ el.setSelectionRange(pos,pos); }catch(_){ /* 一部環境で失敗しても無視 */ }
+    }
+    function updateA(mode='soft'){
+      setCount(line1,l1count,l1bar); setCount(line2,l2count,l2bar);
+  // Line1 は Check 押下までエラー非表示 (checkedL1 が true になるまで)
+      if(!checkedL1){
+        resetBadges(); // 初期状態クリア（非表示）
+        [l1valid,l2valid].forEach(el=>{ if(el) el.classList.remove('show'); });
+      } else {
+        // Line1 の既存表示を維持するため l1valid/errLine1 は触らない
+        // ただし VALID バッジ表示中で内容が変わった/長さ不足になったら非表示にする（再検証は次のCheckまで行わない）
+        if(l1valid && l1valid.classList.contains('show')){
+          const cur=line1.value;
+          if(cur.length!==44 || (lastValidatedL1 && cur!==lastValidatedL1)){
+            l1valid.classList.remove('show');
+          }
+        }
+        // Line2 も VALID 表示中で内容変化/長さ不足なら非表示（Line2 はまだチェックボタン無しだが統一挙動）
+        if(l2valid && l2valid.classList.contains('show')){
+          const cur2=line2.value;
+            if(cur2.length!==44 || (lastValidatedL2 && cur2!==lastValidatedL2)){
+              l2valid.classList.remove('show');
+            }
+        }
+      }
+      const v1=line1.value, v2=line2.value;
+      if(!v1 && !v2){
+        errLine1.innerHTML=''; errLine2.innerHTML='';
+        if(statusA){ statusA.className='status warn'; statusA.textContent='Waiting for input…'; }
+        return;
+      }
+      const has1 = v1.length>0; const has2 = v2.length>0;
+      // Line1 / Line2 それぞれチェック済みなら再検証を行わず凍結表示
+      const freeze1 = checkedL1 && has1;
+      const freeze2 = checkedL2 && has2;
+      if((freeze1 || freeze2)){
+        if(statusA){
+          if(freeze1 && !has2){ statusA.className='status warn'; statusA.textContent='Enter Line 2…'; }
+          else if(freeze2 && !has1){ statusA.className='status warn'; statusA.textContent='Enter Line 1…'; }
+          else if(freeze1 && freeze2){ statusA.className='status warn'; statusA.textContent='Both lines frozen (checked).'; }
+          else { statusA.className='status warn'; statusA.textContent='Keep typing…'; }
+        }
+        // 片方未入力で未チェックの場合はその行への誘導も兼ねる
+        return;
+      }
+      // 両行に入力があるが Line1 のチェック未実行なら Line1 エラーは抑制
+      if(has1 && has2){
+        // 両行入力中。未チェック行のみ長さ誘導、構造エラーは非表示。
+        if(!checkedL1 || !checkedL2){
+          errLine1.innerHTML=''; errLine2.innerHTML='';
+          if(statusA){
+            if(!checkedL1){
+              if(v1.length===44){ statusA.className='status warn'; statusA.textContent='Line 1 ready. Tap Check.'; }
+              else { statusA.className='status warn'; statusA.textContent='Complete Line 1 then Check.'; }
+            } else if(!checkedL2){
+              if(v2.length===44){ statusA.className='status warn'; statusA.textContent='Line 2 ready. Tap Check.'; }
+              else { statusA.className='status warn'; statusA.textContent='Complete Line 2 then Check.'; }
+            } else { statusA.className='status warn'; statusA.textContent='Ready to final check.'; }
+          }
+          return;
+        }
+      }
+      // どちらか片方だけ入力されている場合は、その行のみバリデーションし未入力行はスキップ
+      if(has1 && !has2){
+        // Line1 のみ入力中。チェックボタンが押されていなければエラー非表示。
+        if(!checkedL1){
+          errLine1.innerHTML=''; errLine2.innerHTML='';
+          if(statusA){
+            if(v1.length===44){ statusA.className='status warn'; statusA.textContent='Line 1 ready. Tap Check.'; }
+            else { statusA.className='status warn'; statusA.textContent='Keep typing Line 1…'; }
+          }
+          return;
+        }
+        // チェック済みの場合のみ従来バリデーション実行
+        const errs = validateLine1Only(v1,{suppressLengthErrors:false});
+        errLine1.innerHTML = errs.length ? '<ul class="errorlist">'+errs.map(e=>`<li>${e}</li>`).join('')+'</ul>' : '';
+        errLine2.innerHTML='';
+        if(v1.length===44){ errs.length===0 ? showBadge(l1valid,'valid') : showBadge(l1valid,'error'); }
+        if(statusA){
+          if(errs.length===0){ statusA.className='status warn'; statusA.textContent='Enter Line 2…'; }
+          else { statusA.className='status err'; statusA.textContent='Please check Line 1.'; }
+        }
+        return;
+      }
+      if(!has1 && has2){
+        if(!checkedL2){
+          errLine1.innerHTML=''; errLine2.innerHTML='';
+          if(statusA){
+            if(v2.length===44){ statusA.className='status warn'; statusA.textContent='Line 2 ready. Tap Check.'; }
+            else { statusA.className='status warn'; statusA.textContent='Keep typing Line 2…'; }
+          }
+          return;
+        }
+        const errs = validateLine2Only(v2,{suppressLengthErrors:false});
+        errLine1.innerHTML='';
+        errLine2.innerHTML = errs.length ? '<ul class="errorlist">'+errs.map(e=>`<li>${e}</li>`).join('')+'</ul>' : '';
+        if(v2.length===44){ errs.length===0 ? showBadge(l2valid,'valid') : showBadge(l2valid,'error'); }
+        if(statusA){
+          if(errs.length===0){ statusA.className='status warn'; statusA.textContent='Enter Line 1…'; }
+          else { statusA.className='status err'; statusA.textContent='Please check Line 2.'; }
+        }
+        return;
+      }
+      const bothComplete = v1.length===44 && v2.length===44;
+      // 両方チェック済みで 44 文字揃った場合のみ総合検証
+      if(!(checkedL1 && checkedL2 && bothComplete)){
+        if(statusA){ statusA.className='status warn'; statusA.textContent='Run both Checks to validate.'; }
+        return;
+      }
+      const res = validateTD3(v1, v2, { suppressLengthErrors: false });
+      errLine1.innerHTML = res.errs1.length ? '<ul class="errorlist">'+res.errs1.map(e=>`<li>${e}</li>`).join('')+'</ul>' : '';
+      errLine2.innerHTML = res.errs2.length ? '<ul class="errorlist">'+res.errs2.map(e=>`<li>${e}</li>`).join('')+'</ul>' : '';
+      if(statusA){
+        if(res.ok){ statusA.className='status ok'; statusA.textContent='All checks passed. Looks valid.'; }
+        else if(suppress && res.errs1.length===0 && res.errs2.length===0){ statusA.className='status warn'; statusA.textContent='Keep typing…'; }
+        else { statusA.className='status err'; statusA.textContent='Please check highlighted errors.'; }
+      }
+      if(v1.length===44){ res.errs1.length===0 ? showBadge(l1valid,'valid') : showBadge(l1valid,'error'); }
+  if(v2.length===44){ res.errs2.length===0 ? showBadge(l2valid,'valid') : showBadge(l2valid,'error'); }
+    }
+
+    let composing1=false, composing2=false;
+    function attach(el, setFlag){
+      el.addEventListener('compositionstart',()=>{ setFlag(true); });
+      el.addEventListener('compositionend',()=>{ setFlag(false); clean(el); updateA('full'); });
+      el.addEventListener('input',()=>{ if(setFlag()==='get') return; if(!setFlag()) { clean(el); updateA('soft'); } });
+      el.addEventListener('blur',()=>{ if(!setFlag()) { clean(el); updateA('full'); } });
+      el.addEventListener('paste',()=>{ setTimeout(()=>{ clean(el); updateA('full'); },0); });
+    }
+    // setFlag 関数で getter/setter 両用
+    function flagWrapper(ref){ return (v)=>{ if(v===true){ ref.value=true; } else if(v===false){ ref.value=false; } return ref.value; }; }
+    const f1=flagWrapper({value:false});
+    const f2=flagWrapper({value:false});
+    attach(line1,f1);
+    attach(line2,f2);
+
+  // actions (クリア系はキーパッド末尾キーで対応)
+  // 入力例トグル（上部ヘッダー内）
+  const sampleBox=document.getElementById('sampleBox');
+  const sampleBoxBody=document.getElementById('sampleBoxBody');
+  const toggleSampleBtn=document.getElementById('toggleSample');
+  if(toggleSampleBtn && sampleBoxBody){
+    toggleSampleBtn.addEventListener('click',()=>{
+      const hidden = sampleBoxBody.hasAttribute('hidden');
+      if(hidden){
+        sampleBoxBody.removeAttribute('hidden');
+        toggleSampleBtn.textContent='Hide sample';
+        toggleSampleBtn.setAttribute('aria-expanded','true');
+      }else{
+        sampleBoxBody.setAttribute('hidden','');
+        toggleSampleBtn.textContent='Show sample';
+        toggleSampleBtn.setAttribute('aria-expanded','false');
+      }
+    });
+  // 初期状態: hidden のためボタン表示テキストは「Show sample」を維持
+  }
+  // Line2 sample toggle (independent)
+  const sampleBoxBody2=document.getElementById('sampleBoxBody2');
+  const toggleSampleBtn2=document.getElementById('toggleSample2');
+  if(toggleSampleBtn2 && sampleBoxBody2){
+    toggleSampleBtn2.addEventListener('click',()=>{
+      const hidden=sampleBoxBody2.hasAttribute('hidden');
+      if(hidden){
+        sampleBoxBody2.removeAttribute('hidden');
+        toggleSampleBtn2.textContent='入力例を隠す';
+        toggleSampleBtn2.setAttribute('aria-expanded','true');
+      } else {
+        sampleBoxBody2.setAttribute('hidden','');
+        toggleSampleBtn2.textContent='入力例を表示';
+        toggleSampleBtn2.setAttribute('aria-expanded','false');
+      }
+    });
+  // 初期状態 hidden
+  }
+  // サンプル行の長さ保証（44文字に不足分を < で埋める）
+  ['sampleL1','sampleL2'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return; const txt=el.textContent.trim();
+    if(txt.length<44){ el.textContent = txt + '<'.repeat(44-txt.length); }
+  });
+
+    // keypad-only mode (default ON for touch, OFF for desktop)
+  let toggleBtn; // 後でキーパッド内キー生成後に取得
+    const isCoarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints>0);
+  // デフォルトは常に表示 (初期 ON)
+  let keypadMode = true; // (isCoarse || isTouch) を上書き
+  /* 動的フォントサイズ調整 (fitInputs) はCSSメディアクエリへ移行したため削除 */
+    function applyKeypadMode(){
+      [line1,line2].forEach(inp=>{
+        if(keypadMode){ inp.setAttribute('readonly','readonly'); inp.setAttribute('inputmode','none'); inp.setAttribute('autocapitalize','off'); inp.setAttribute('autocomplete','off'); inp.setAttribute('spellcheck','false'); }
+        else { inp.removeAttribute('readonly'); inp.setAttribute('inputmode','latin'); }
+      });
+  /* compactクラスによるletter-spacing調整は廃止 */
+  // スイッチチェック状態反映
+  if(toggleBtn.type==='checkbox'){ toggleBtn.checked=keypadMode; }
+  toggleBtn.setAttribute('aria-pressed', keypadMode?'true':'false');
+      /* フォントサイズはCSSで自動調整されるためJS側での再計算不要 */
+      const keypadWrap = document.querySelector('.keypad');
+      if(keypadWrap){
+        if(keypadMode){ keypadWrap.classList.remove('hide'); keypadWrap.removeAttribute('aria-hidden'); }
+        else { keypadWrap.classList.add('hide'); keypadWrap.setAttribute('aria-hidden','true'); }
+      }
+    }
+  // クリックリスナーはキーパッドキー生成後に付与
+    [line1,line2].forEach(inp=>{ inp.addEventListener('keydown',()=>{ if(keypadMode && !isCoarse && !isTouch){ keypadMode=false; applyKeypadMode(); } }); });
+  /* 画面サイズ変化時のJSによるfont-size再計算は不要になったためリスナー除去 */
+
+    // keypad builder (A–Z, then < & Backspace wide; next row digits 0–9 + Clear wide)
+  const keypadEl=document.getElementById('keypad'); // inner keys grid (always present)
+    function activeField(){ return currentField || line1; }
+    // caret 対応挿入/削除ヘルパー
+    function insertAtCaret(field, text){
+      const start = field.selectionStart ?? field.value.length;
+      const end = field.selectionEnd ?? start;
+      const before = field.value.slice(0,start);
+      const after  = field.value.slice(end);
+      let next = (before + text + after).slice(0,44);
+      field.value = next;
+      const caretPos = Math.min(start + text.length, field.value.length);
+      field.setSelectionRange(caretPos, caretPos);
+    }
+    // FILL< で追加した < の開始位置を記録（行ごとに）
+    let fillPadStart1=null, fillPadStart2=null; // 行1/行2用
+    function fillPadStartRef(field){ return (field===line1?fillPadStart1:fillPadStart2); }
+    function setFillPadStart(field,pos){ if(field===line1) fillPadStart1=pos; else fillPadStart2=pos; }
+    function clearFillPadStart(field){ if(field===line1) fillPadStart1=null; else fillPadStart2=null; }
+
+    function backspaceAtCaret(field){
+      const start = field.selectionStart ?? field.value.length;
+      const end = field.selectionEnd ?? start;
+      const fillStart = fillPadStartRef(field);
+      // FILL<で追加されたパディング領域内: まとめてではなく直前の1つの<だけ削除
+      if(fillStart!==null && end===start){
+        // キャレットがパディング開始より後ろ: 直前の1文字 '<' を削除
+        if(start>fillStart){
+          const prevChar = field.value[start-1];
+          if(prevChar==='<' && start-1 >= fillStart){
+            field.value = field.value.slice(0,start-1) + field.value.slice(start);
+            const newPos = start-1;
+            field.setSelectionRange(newPos,newPos);
+            if(!field.value.slice(fillStart).includes('<')) clearFillPadStart(field);
+            return;
+          }
+        } else if(start===fillStart){
+          // キャレットがパディング領域先頭: ユーザー意図は最後のパディング'<'
+          const lastPadIndex = field.value.lastIndexOf('<');
+          if(lastPadIndex>=fillStart){
+            field.value = field.value.slice(0,lastPadIndex) + field.value.slice(lastPadIndex+1);
+            // キャレットはパディング開始位置を維持
+            field.setSelectionRange(fillStart,fillStart);
+            if(!field.value.slice(fillStart).includes('<')) clearFillPadStart(field);
+            return;
+          }
+        }
+      }
+      if(start!==end){
+        // 選択削除
+        const before = field.value.slice(0,start);
+        const after = field.value.slice(end);
+        field.value = (before+after);
+        field.setSelectionRange(start,start);
+        return;
+      }
+      if(start===0) return;
+      const before = field.value.slice(0,start-1);
+      const after = field.value.slice(start);
+      field.value = (before+after);
+      const caretPos = start-1;
+      field.setSelectionRange(caretPos, caretPos);
+    }
+    function fillPad(field){
+      // カーソル位置は保持しつつ末尾を < で 44 文字までパディング
+      const caret = field.selectionStart ?? field.value.length;
+      if(field.value.length<44){
+        const padCount = 44 - field.value.length;
+        setFillPadStart(field, field.value.length); // パディング開始位置記録
+        field.value = field.value + '<'.repeat(padCount);
+      }
+      // caret は元位置 (末尾にいた場合は末尾)
+      const pos = Math.min(caret, field.value.length);
+      field.setSelectionRange(pos,pos);
+    }
+    function makeKey(txt,opts={}){
+      const b=document.createElement('button');
+      b.type='button';
+      b.className='key';
+      if(opts.span){ b.classList.add(`key--span${opts.span}`); }
+      else if(opts.wide){ b.classList.add('key--span2'); }
+      else if(opts.widewide){ b.classList.add('key--span4'); }
+      b.textContent=txt;
+      b.setAttribute('aria-label',opts.label||txt);
+      if(opts.id){ b.id=opts.id; }
+      if(opts.action){ b.dataset.action = opts.action; }
+      b.addEventListener('pointerdown',(e)=>{
+        e.preventDefault();
+        const field=activeField();
+        if(opts.action==='back'){ backspaceAtCaret(field); updateA('soft'); field.focus(); return; }
+        if(opts.action==='clear'){ field.value=''; field.setSelectionRange(0,0); updateA('soft'); field.focus(); return; }
+        if(opts.action==='fillpad'){ fillPad(field); updateA('soft'); field.focus(); return; }
+        if(opts.action==='clearL1'){
+          line1.value=''; errLine1.innerHTML=''; if(l1valid){ l1valid.classList.remove('show'); }
+          updateA('soft'); line1.focus(); return;
+        }
+        if(opts.action==='clearL2'){
+          line2.value=''; errLine2.innerHTML=''; if(l2valid){ l2valid.classList.remove('show'); }
+          updateA('soft'); line2.focus(); return;
+        }
+        if(opts.action==='clearBoth'){
+          line1.value=''; line2.value=''; errLine1.innerHTML=''; errLine2.innerHTML='';
+          if(statusA){ statusA.className='status warn'; statusA.textContent='Waiting for input…'; }
+          setCount(line1,l1count,l1bar); setCount(line2,l2count,l2bar); resetBadges();
+          updateA('soft'); line1.focus(); return;
+        }
+        if(opts.action==='toggleKeypad'){
+          keypadMode=!keypadMode; applyKeypadMode(); return;
+        }
+        if(field.value.length<44){ insertAtCaret(field, txt); updateA('soft'); }
+        field.focus();
+      });
+      return b;
+    }
+  // 数字行 (最上段)
+  '1234567890'.split('').forEach(k=>keypadEl.appendChild(makeKey(k)));
+  function addBreak(){ const br=document.createElement('div'); br.className='break'; keypadEl.appendChild(br); }
+  addBreak();
+  // QWERTY 1段目
+  'QWERTYUIOP'.split('').forEach(k=>keypadEl.appendChild(makeKey(k)));
+  addBreak();
+  // QWERTY 2段目 + L の右に < キー (グリーン) 復帰
+  'ASDFGHJKL'.split('').forEach(k=>keypadEl.appendChild(makeKey(k)));
+  // 末尾の < キーを削除し Backspace (BS) を単幅で配置
+  // Backspace アイコンキー（Bootstrap Icons）
+  const bsKey = makeKey('',{label:'Backspace',action:'back'});
+  // フォントアイコンが表示されない環境向けにインラインSVGを使用
+  bsKey.innerHTML = '<i class="bi bi-backspace"></i>';
+  keypadEl.appendChild(bsKey);
+  addBreak();
+  // QWERTY 3段目 + < + FILL< (span2) で10列埋め
+  'ZXCVBNM'.split('').forEach(k=>keypadEl.appendChild(makeKey(k)));
+  keypadEl.appendChild(makeKey('<',{label:'Less-than',action:'lt'}));
+  keypadEl.appendChild(makeKey('FILL<',{span:2,action:'fillpad',label:'残りを < で埋める / Fill remaining with <'}));
+  addBreak();
+  // Clear 行 (各3幅) + Keypad モード切替 (All Clear は削除済)
+  /* Clear buttons moved next to error areas */
+  // All Clear キーは要望により削除
+  // キーパッド内トグルキーは削除（.actions 内の通常ボタンに移行）
+
+    // init
+  // キーパッド内のトグルキー参照取得後にイベント設定
+  toggleBtn=document.getElementById('toggleKeypad');
+  // クリックでモード切替
+  if(toggleBtn){ toggleBtn.addEventListener('change',()=>{ keypadMode=toggleBtn.checked; applyKeypadMode(); }); }
+  applyKeypadMode();
+  // 初期表示用（空の状態でもバー幅とバッジ状態を反映）
+  setCount(line1,l1count,l1bar); setCount(line2,l2count,l2bar);
+  updateA('soft');
+
+  // Clear buttons next to errors
+  const clearL1Btn=document.getElementById('clearL1Btn');
+  const clearL2Btn=document.getElementById('clearL2Btn');
+  const checkL1Btn=document.getElementById('checkL1Btn');
+  const checkL2Btn=document.getElementById('checkL2Btn');
+  var checkedL1=false; // updateA 内から参照されるため先行定義
+  var lastValidatedL1=''; // VALID確定時のLine1スナップショット
+  var checkedL2=false; // Line2 版（将来 Check ボタン拡張時に使用）
+  var lastValidatedL2=''; // VALID確定時のLine2スナップショット
+  // Line1入力時: 再編集で検証状態解除しエラー非表示
+  line1.addEventListener('input',()=>{
+  // Check 前のみクリア。Check後は凍結表示維持。
+    if(!checkedL1){ errLine1.innerHTML=''; if(l1valid) l1valid.classList.remove('show'); }
+    else {
+      // 既にVALID表示中で内容が変わったら非表示 (再検証は次回Checkまで行わない)
+      if(l1valid && l1valid.classList.contains('show')){
+        l1valid.classList.remove('show');
+      }
+    }
+  // 編集開始で大型アイコンも消す（未検証状態へ戻す）
+  const ic1=document.getElementById('l1ok'); if(!checkedL1 && ic1){ ic1.classList.remove('show'); ic1.innerHTML=''; }
+  });
+  // Line2入力時: VALIDバッジが出ている状態で内容変更/短縮されたら非表示（現状は常時自動検証だが Line1 と同じ挙動に揃える）
+  line2.addEventListener('input',()=>{
+    if(l2valid && l2valid.classList.contains('show')){
+      l2valid.classList.remove('show');
+    }
+  const ic2=document.getElementById('l2ok'); if(!checkedL2 && ic2){ ic2.classList.remove('show'); ic2.innerHTML=''; }
+  });
+  if(checkL1Btn){
+    checkL1Btn.addEventListener('click',()=>{
+      const len=line1.value.length;
+      if(len<44){
+        // チェック未完了扱い (checkedL1 は true にしない)
+        errLine1.innerHTML='<ul class="errorlist"><li>44文字入力してください。</li></ul>';
+  if(l1valid) l1valid.classList.remove('show');
+  // 長さ不足でもエラーアイコン表示
+  showBadge(l1valid,'error');
+        if(statusA){ statusA.className='status err'; statusA.textContent='Line 1: 44文字入力してください。'; }
+        return;
+      }
+      checkedL1=true;
+      // ここで初めて Line1 構造検証を実施
+      const errs = validateLine1Only(line1.value,{suppressLengthErrors:false});
+      errLine1.innerHTML = errs.length ? '<ul class="errorlist">'+errs.map(e=>`<li>${e}</li>`).join('')+'</ul>' : '';
+      if(line1.value.length===44){ errs.length===0 ? showBadge(l1valid,'valid') : showBadge(l1valid,'error'); }
+      // VALIDならスナップショット更新（エラーの場合は空にして常に非表示対象にする）
+      if(errs.length===0 && line1.value.length===44){ lastValidatedL1=line1.value; } else { lastValidatedL1=''; }
+      if(statusA){
+        if(errs.length===0){ statusA.className='status warn'; statusA.textContent='Enter Line 2…'; }
+        else { statusA.className='status err'; statusA.textContent='Please check Line 1.'; }
+      }
+      updateA('full');
+    });
+  }
+  if(checkL2Btn){
+    checkL2Btn.addEventListener('click',()=>{
+      const len=line2.value.length;
+      if(len<44){
+        errLine2.innerHTML='<ul class="errorlist"><li>44文字入力してください。</li></ul>';
+  if(l2valid) l2valid.classList.remove('show');
+  showBadge(l2valid,'error');
+        // Line1 状態に影響せずステータス誘導
+        if(statusA){ statusA.className='status warn'; statusA.textContent='Line 2: 44文字入力してください。'; }
+        return;
+      }
+      checkedL2=true;
+      const errs = validateLine2Only(line2.value,{suppressLengthErrors:false});
+      errLine2.innerHTML = errs.length ? '<ul class="errorlist">'+errs.map(e=>`<li>${e}</li>`).join('')+'</ul>' : '';
+      if(line2.value.length===44){ errs.length===0 ? showBadge(l2valid,'valid') : showBadge(l2valid,'error'); }
+      if(errs.length===0 && line2.value.length===44){ lastValidatedL2=line2.value; } else { lastValidatedL2=''; }
+      if(statusA){
+        if(errs.length===0){
+          // 両行がチェック済みで両方OKなら全体判定へ誘導
+          if(checkedL1 && lastValidatedL1 && lastValidatedL2){ statusA.className='status ok'; statusA.textContent='Both lines OK.'; }
+          else { statusA.className='status warn'; statusA.textContent='Line 1 を確認してください'; }
+        } else { statusA.className='status err'; statusA.textContent='Please check Line 2.'; }
+      }
+      updateA('full');
+    });
+  }
+  if(clearL1Btn){ clearL1Btn.addEventListener('click',()=>{ line1.value=''; errLine1.innerHTML=''; if(l1valid){ l1valid.classList.remove('show'); } const ic=document.getElementById('l1ok'); if(ic){ ic.classList.remove('show'); ic.innerHTML=''; } setCount(line1,l1count,l1bar); updateA('soft'); line1.focus(); }); }
+  if(clearL2Btn){ clearL2Btn.addEventListener('click',()=>{ line2.value=''; errLine2.innerHTML=''; if(l2valid){ l2valid.classList.remove('show'); } const ic=document.getElementById('l2ok'); if(ic){ ic.classList.remove('show'); ic.innerHTML=''; } lastValidatedL2=''; setCount(line2,l2count,l2bar); updateA('soft'); line2.focus(); }); }
+  </script>
+</body>
+</html>
