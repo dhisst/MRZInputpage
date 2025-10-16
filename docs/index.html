@@ -8,541 +8,566 @@
   <link href="css/bootstrap.min.v5.3.0.css" rel="stylesheet">
   <link href="css/style_pr_responsive.css" rel="stylesheet">
   <style>
-    :root {
-      /* Color & base */
-      --fg: #14171a;
-      --bg: #fafafa;
-      --card: #fff;
-      --line: #e5e7eb;
-      --focus: #ffa702;
-      --ok: #1b5e20;
-      --warn: #8a4b00;
-      --err: #b00020;
-      --mono: ui-monospace,"JetBrains Mono","Roboto Mono",monospace;
-      --keypad-bg: #eef6ff;
-      --progress-start: #2e7d32;
-      --progress-end: #66bb6a;
-      --input-border: #b7dcff;
-      --input-font-size: 18px; /* base */
-      --mrz-letter-spacing: 2.35px; /* normal tracking */
-      --sample-pre-font-size: 14px;
-      --sample-code-font-size: 20px;
-      --sample-code-letter-spacing: 2.35px;
-      --sample-note-font-size: 11px;
-  --key-min-height: 40px; /* keypad key base height */
-  --error-slot-min-height: 60px; /* reserve space for per-line errors (approx 3 lines) */
-  --key-min-height: 40px; /* keypad key base height */
-  /* Keypad toggle responsive vars */
-  --keypad-switch-font-size:14px;
-  --keypad-switch-scale:1;
-  --keypad-switch-track-width:42px;
-  /* Count badge base size */
-  --count-font-size:13px;
-  --count-padding-y:2px;
-  --count-padding-x:10px;
-  --keypad-switch-track-height:24px;
-  /* Label title base size */
-  --label-title-font-size:17px;
-  /* Validate button sizing vars */
-  --check-btn-font-size:12px;
-  --check-btn-padding-y:6px;
-  --check-btn-padding-x:12px;
-  --check-btn-radius:8px;
-    }
+/* =========================================
+   0) Design Tokens (テーマ変数)
+   ========================================= */
+:root {
+  /* Color */
+  --fg: #14171a;
+  --bg: #fafafa;
+  --card: #fff;
+  --line: #e5e7eb;
+  --focus: #ffa702;
+  --ok: #1b5e20;
+  --warn: #8a4b00;
+  --err: #b00020;
+  --mono: ui-monospace, "JetBrains Mono", "Roboto Mono", monospace;
+  --keypad-bg: #eef6ff;
+  --progress-start: #2e7d32;
+  --progress-end: #66bb6a;
+  --input-border: #b7dcff;
 
-    /* Layout resets */
-    * { box-sizing: border-box; }
-    h1 {
-      font-size: 20px;
-      margin: 8px 0 12px;
-    }
+  /* Typography / sizing */
+  --input-font-size: 18px;
+  --mrz-letter-spacing: 2.35px;
 
-    /* Card */
-    .card {
-      background: var(--card);
-      /*border: 1px solid var(--line);*/
-      /*border-radius: 14px;*/
-      padding: 12px;
-    }
-    @media (min-width:720px) { .card { padding:16px; } }
+  /* Sample area */
+  --sample-pre-font-size: 14px;
+  --sample-code-font-size: 20px;
+  --sample-code-letter-spacing: 2.35px;
+  --sample-note-font-size: 11px;
 
-    /* Labels & counters */
-    label {
-      display:flex;
-      justify-content:flex-start; /* button stays directly right of label title */
-      gap:8px;
-      font-size:14px;
-      color:#555;
-      margin:10px 0 6px;
-    }
-    label .countwrap { margin-left:auto; } /* push counter group to far right */
-    .count {
-  font-size:var(--count-font-size);
-  font-family:var(--mono);
-  background:#eef2ff;
-  color:#1e3a8a;
-  padding:var(--count-padding-y) var(--count-padding-x);
-  border-radius:999px;
-  line-height:1;
-  display:inline-block;
-  min-width:80px;
-  text-align:center;
-  letter-spacing:.5px;
-  transition:background .25s,color .25s;
-    }
-  /* Responsive count scaling */
-  @media (min-width:480px){ :root { --count-font-size:14px; --count-padding-y:3px; --count-padding-x:12px; } }
-  @media (min-width:640px){ :root { --count-font-size:15px; --count-padding-y:4px; --count-padding-x:14px; } }
-  @media (min-width:840px){ :root { --count-font-size:16px; --count-padding-y:5px; --count-padding-x:16px; } }
-  @media (min-width:1024px){ :root { --count-font-size:17px; --count-padding-y:6px; --count-padding-x:18px; } }
-  @media (min-width:1280px){ :root { --count-font-size:18px; --count-padding-y:7px; --count-padding-x:20px; } }
-    .count.near {
-      background:#fff8e1;
-      color:var(--warn);
-    }
-    .count.complete {
-      background:#e8f5e9;
-      color:var(--ok);
-    }
-    .progressline {
-      height:4px;
-      background:#e5e7eb;
-      border-radius:2px;
-      overflow:hidden;
-      margin:4px 0 2px;
-    }
-    .progressline span {
-      display:block;
-      height:100%;
-      width:0;
-      background:linear-gradient(90deg,var(--progress-start),var(--progress-end));
-      transition:width .25s;
-    }
-    .badge-state {
-      display:none;
-      font-size:11px;
-      font-family:var(--mono);
-      padding:3px 8px;
-      border-radius:999px;
-      font-weight:600;
-      line-height:1;
-      letter-spacing:.5px;
-      border:1px solid transparent;
-    }
-    .badge-valid {
-      background:#e8f5e9;
-      color:var(--ok);
-      border-color:#c8e6c9;
-    }
-    .badge-error {
-      background:#ffebee;
-      color:var(--err);
-      border-color:#ffcdd2;
-    }
-    .badge-state.show { display:inline-block; }
-    .countwrap {
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .label-title {
-      font-weight:600;
-      color:#000;
-      font-size:var(--label-title-font-size);
-    }
-    /* Responsive label title scaling */
-    @media (min-width:480px){ :root { --label-title-font-size:17px; } }
-    @media (min-width:640px){ :root { --label-title-font-size:19px; } }
-    @media (min-width:840px){ :root { --label-title-font-size:21px; } }
-    @media (min-width:1024px){ :root { --label-title-font-size:23px; } }
-    @media (min-width:1280px){ :root { --label-title-font-size:25px; } }
+  /* Keypad */
+  --key-min-height: 40px;
 
-    /* Input area */
-    .guideline { position:relative; }
-    input[type=text] {
-      width:100%;
-      padding:3px 12px;
-      border:3px solid var(--input-border);
-      border-radius:10px;
-      font-size:var(--input-font-size);
-      background:#fff;
-    }
-    input.mono {
-      font-family:var(--mono);
-      font-variant-numeric:slashed-zero;
-      letter-spacing:var(--mrz-letter-spacing);
-    }
-  .mrz-line { padding-right:42px; }
-    input:focus {
-      outline:none;
-      border-color:var(--focus);
-      box-shadow:0 0 2px 4px rgb(245, 202, 60);
-    }
-    .guideline::before {
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      border-radius:10px;
-      display:none;
-    }
-  .valid-large{display:none;width:30px;height:30px;margin-left:8px;display:inline-flex;align-items:center;justify-content:center;}
-  .valid-large.show{display:inline-flex;}
+  /* Error message reserved space */
+  --error-slot-min-height: 60px;
 
-    .row {
-      display:grid;
-      grid-template-columns:1fr;
-      gap:10px;
-    }
+  /* Keypad toggle (Bootstrap switch) */
+  --keypad-switch-font-size: 14px;
+  --keypad-switch-scale: 1;
+  --keypad-switch-track-width: 42px;
+  --keypad-switch-track-height: 24px;
 
-    /* Actions */
-    .actions {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-      margin-top:10px;
-      justify-content:flex-end; /* push contents to right */
-    }
-  #keypadSwitchWrap { margin-left:auto; display:flex; align-items:center; gap:8px; }
-  #keypadSwitchWrap .form-check-label { font-size:var(--keypad-switch-font-size); font-weight:600; user-select:none; margin-left: 10px;}
-  #keypadSwitchWrap .form-check-input {
-    width:var(--keypad-switch-track-width);
-    height:var(--keypad-switch-track-height);
-    margin:0; /* remove bootstrap default negative margin for switch */
-    transform:scale(var(--keypad-switch-scale));
-    transform-origin:left center;
-    cursor:pointer;
+  /* Counter badge */
+  --count-font-size: 13px;
+  --count-padding-y: 2px;
+  --count-padding-x: 10px;
+
+  /* Label title */
+  --label-title-font-size: 17px;
+
+  /* Validate button */
+  --check-btn-font-size: 12px;
+  --check-btn-padding-y: 6px;
+  --check-btn-padding-x: 12px;
+  --check-btn-radius: 8px;
+}
+
+/* =========================================
+   1) Base / Reset
+   ========================================= */
+* { box-sizing: border-box; }
+h1 { font-size: 20px; margin: 8px 0 12px; }
+
+/* =========================================
+   2) Label + Counter (上部ラベル行)
+   -----------------------------------------
+   - label行左にタイトル、右側にcount群
+   ========================================= */
+label {
+  display: flex;
+  justify-content: flex-start;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+  margin: 10px 0 6px;
+}
+.label-title {
+  font-weight: 600;
+  color: #000;
+  font-size: var(--label-title-font-size);
+}
+.countwrap { /* 右寄せ（タイトルとボタンの間に空間を作らない） */
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.count {
+  font-size: var(--count-font-size);
+  font-family: var(--mono);
+  background: #eef2ff;
+  color: #1e3a8a;
+  padding: var(--count-padding-y) var(--count-padding-x);
+  border-radius: 999px;
+  line-height: 1;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  letter-spacing: .5px;
+  transition: background .25s, color .25s;
+}
+.count.near     { background: #fff8e1; color: var(--warn); }
+.count.complete { background: #e8f5e9; color: var(--ok); }
+
+/* 小さなステータスバッジ（必要時のみ表示） */
+.badge-state {
+  display: none;
+  font-size: 11px;
+  font-family: var(--mono);
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: .5px;
+  border: 1px solid transparent;
+}
+.badge-valid { background: #e8f5e9; color: var(--ok);  border-color: #c8e6c9; }
+.badge-error { background: #ffebee; color: var(--err); border-color: #ffcdd2; }
+.badge-state.show { display: inline-block; }
+
+/* 進捗ライン（L1 / L2 カウント下） */
+.progressline {
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 4px 0 2px;
+}
+.progressline span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--progress-start), var(--progress-end));
+  transition: width .25s;
+}
+
+/* =========================================
+   3) 入力（MRZ）フィールド
+   ========================================= */
+.guideline { position: relative; }
+input[type="text"] {
+  width: 100%;
+  padding: 3px 12px;
+  border: 3px solid var(--input-border);
+  border-radius: 10px;
+  font-size: var(--input-font-size);
+  background: #fff;
+}
+input.mono {
+  font-family: var(--mono);
+  font-variant-numeric: slashed-zero;
+  letter-spacing: var(--mrz-letter-spacing);
+}
+.mrz-line { padding-right: 42px; } /* 右側にアイコンやボタンが被らない余白 */
+input:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 2px 4px rgb(245 202 60);
+}
+
+/* OKマーク（行右側の丸アイコン） */
+.valid-large {
+  width: 30px;
+  height: 30px;
+  margin-left: 8px;
+  display: none;
+  inline-size: 30px;
+  block-size: 30px;
+  align-items: center;
+  justify-content: center;
+}
+.valid-large.show { display: inline-flex; }
+
+/* =========================================
+   4) 行内アクション（検証/クリア）
+   ========================================= */
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.btn-check-line {
+  padding: var(--check-btn-padding-y) var(--check-btn-padding-x);
+  font-size: var(--check-btn-font-size);
+  line-height: 1.1;
+  border-radius: var(--check-btn-radius);
+  border: 1px solid var(--line);
+  background: #fff;
+  cursor: pointer;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.btn-check-line:disabled { opacity: .45; cursor: not-allowed; }
+.btn-check-line:not(:disabled) {
+  background: #166534; border-color: #166534; color: #fff;
+}
+.btn-check-line:not(:disabled):hover  { background: #14532d; border-color: #14532d; }
+.btn-check-line:not(:disabled):active { background: #0f3f22; border-color: #0f3f22; }
+
+/* 行単位クリア（右寄せ固定） */
+.btn-clear-line {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: linear-gradient(#fff5f5, #ffe4e6);
+  border: 1px solid #fecdd3;
+  color: #b91c1c;
+  font-weight: 600;
+  margin-left: auto; /* actionRow内で右端に配置 */
+}
+.btn-clear-line:hover { background: linear-gradient(#fff1f2, #ffd9de); }
+.btn-clear-line:active { background: #fecdd3; }
+
+/* =========================================
+   5) 上部アクションバー（Keypadトグル等）
+   ========================================= */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+  justify-content: flex-end; /* 右寄せ */
+}
+#keypadSwitchWrap {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#keypadSwitchWrap .form-check-label {
+  font-size: var(--keypad-switch-font-size);
+  font-weight: 600;
+  user-select: none;
+  margin-left: 10px;
+}
+#keypadSwitchWrap .form-check-input {
+  width: var(--keypad-switch-track-width);
+  height: var(--keypad-switch-track-height);
+  margin: 0; /* Bootstrapの負マージンを打ち消し */
+  transform: scale(var(--keypad-switch-scale));
+  transform-origin: left center;
+  cursor: pointer;
+}
+#keypadSwitchWrap .form-check-input:focus {
+  box-shadow: 0 0 0 .25rem rgba(255, 167, 2, .35);
+}
+
+/* =========================================
+   6) ステータス / エラー表示
+   ========================================= */
+.tiny { font-size: 12px; color: #666; }
+.status {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  border: 1px solid var(--line);
+}
+.ok   { background: #e8f5e9; color: var(--ok);   border-color: #c8e6c9; }
+.warn { background: #fff8e1; color: var(--warn); border-color: #ffe0b2; }
+.err  { background: #ffebee; color: var(--err);  border-color: #ffcdd2; }
+
+/* 行内のエラー領域（高さを確保してレイアウトジャンプ抑止） */
+.tiny.err {
+  display: block;
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-height: var(--error-slot-min-height);
+}
+.tiny.err:not(:empty) {
+  background: #ffebee;
+  padding: 6px 8px;
+  margin: 5px 0;
+  border-radius: 8px;
+}
+.tiny.err:empty { visibility: hidden; }
+
+.tiny.err .errorlist {
+  list-style: disc;
+  margin: 0;
+  padding: 0 0 0 18px; /* インデント */
+  font-size: 12px;
+  color: var(--err);
+  line-height: 1.35;
+}
+.tiny.err .errorlist li {
+  margin: 2px 0;
+  padding: 0;
+  list-style: disc;
+  word-break: break-word;
+}
+
+/* =========================================
+   7) 画面下部 キーパッド
+   ========================================= */
+.keypad {
+  position: sticky;
+  bottom: 0;
+  background: var(--keypad-bg);
+  border: 1px solid var(--line);
+  padding: 4px;
+  margin-top: 12px;
+  z-index: 10;
+  transition: transform .28s ease, opacity .28s ease;
+}
+.keypad.hide {
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(12px);
+}
+.keys {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0;
+}
+.break { grid-column: 1 / -1; height: 0; }
+
+.key {
+  min-height: var(--key-min-height);
+  border: 1px solid var(--line);
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 500;
+  user-select: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background .12s;
+}
+.key:hover { background: #f1f5f9; }
+.key:active { background: #e2e8f0; }
+.key:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.key[data-action] {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: .5px;
+}
+
+/* 機能キーの配色（戻る/クリア/一括入力等） */
+.key[data-action="clearL1"],
+.key[data-action="clearL2"],
+.key[data-action="back"] {
+  background: linear-gradient(#fff5f5, #ffe4e6);
+  border-color: #fecdd3;
+  color: #b91c1c;
+}
+.key[data-action="clearL1"]:hover,
+.key[data-action="clearL2"]:hover,
+.key[data-action="back"]:hover { background: linear-gradient(#fff1f2, #ffd9de); }
+.key[data-action="clearL1"]:active,
+.key[data-action="clearL2"]:active,
+.key[data-action="back"]:active { background: #fecdd3; }
+
+.key[data-action="fillpad"],
+.key[data-action="lt"] {
+  background: linear-gradient(#e8f5e9, #d0f1d4);
+  border-color: #b2e2b8;
+  color: #1b5e20;
+}
+.key[data-action="fillpad"]:hover,
+.key[data-action="lt"]:hover  { background: linear-gradient(#e1f3e3, #c4eac9); }
+.key[data-action="fillpad"]:active,
+.key[data-action="lt"]:active { background: #b2e2b8; }
+
+.key[data-action="clear"] {
+  background: linear-gradient(#fefce8, #fef9c3);
+  border-color: #fde68a;
+  color: #92400e;
+}
+.key[data-action="clear"]:hover  { background: linear-gradient(#fef9d8, #fef3a8); }
+.key[data-action="clear"]:active { background: #fde68a; }
+
+/* アイコン（Bootstrap Icons） */
+.key svg.bi { width: 1.4em; height: 1.4em; display: block; }
+
+/* 幅拡張ユーティリティ（キー並び制御） */
+.key--span2  { grid-column: span 2; }
+.key--span3  { grid-column: span 3; }
+.key--span4  { grid-column: span 4; }
+.key--span10 { grid-column: 1 / -1; }
+.key.wide     { grid-column: span 2; }
+.key.widewide { grid-column: span 4; }
+
+/* =========================================
+   8) サンプル表示（pre/code）
+   ========================================= */
+.sample-box { margin-top: 0; font-size: 13px; color: #1e3a8a; }
+.sample-box h2 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  color: #1e3a8a;
+}
+.sample-box__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.sample-box__head .btn {
+  padding: 6px 10px; font-size: 12px; line-height: 1; border-radius: 8px;
+}
+.sample-note {
+  margin: 4px 0;
+  font-size: var(--sample-note-font-size);
+  color: #475569;
+  line-height: .9rem;
+}
+/* monobox / pre / code（1行幅確保 & 横スクロール） */
+.monobox,
+.sample-box pre,
+#sampleBoxBody pre,
+#sampleBoxBody2 pre {
+  margin: 6px 0;
+  font: var(--sample-pre-font-size) / 1.15 var(--mono);
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+.sample-box code,
+#sampleBoxBody code,
+#sampleBoxBody2 code {
+  display: block;
+  white-space: pre;
+  font-family: var(--mono);
+  font-size: var(--sample-code-font-size);
+  letter-spacing: var(--sample-code-letter-spacing);
+  min-width: 44ch;
+}
+
+/* =========================================
+   9) 汎用ボタン（Bootstrapと併用）
+   ========================================= */
+.btn {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+
+/* =========================================
+   10) Responsive Tokens（タイポ/スイッチ/キー高）
+   ========================================= */
+@media (max-width: 599px) {
+  :root {
+    --input-font-size: 16px;
+    --sample-note-font-size: 10.5px;
+    --sample-code-font-size: 13px;
+    --sample-code-letter-spacing: .25px;
+    --key-min-height: 44px;
+    --error-slot-min-height: 52px;
   }
-  #keypadSwitchWrap .form-check-input:focus { box-shadow:0 0 0 .25rem rgba(255,167,2,.35); }
-  /* Increase hit area on very small screens */
-  @media (max-width:399px){
-    :root { --keypad-switch-track-width:48px; --keypad-switch-track-height:26px; }
+}
+@media (max-width: 430px) {
+  :root {
+    --input-font-size: 15px;
+    --mrz-letter-spacing: 0;
+    --sample-code-font-size: 13px;
+    --sample-code-letter-spacing: 0;
+    --sample-note-font-size: 10px;
+    --key-min-height: 46px;
+    --error-slot-min-height: 50px;
   }
-  @media (min-width:480px){
-    :root { --keypad-switch-font-size:15px; --keypad-switch-scale:1.06; }
+  input[type="text"] { padding: 10px 6px; }
+}
+@media (max-width: 380px) {
+  :root {
+    --input-font-size: 13px;
+    --mrz-letter-spacing: 0;
+    --sample-code-font-size: 13px;
+    --sample-code-letter-spacing: 0;
+    --sample-note-font-size: 9.5px;
+    --key-min-height: 36px;
+    --error-slot-min-height: 48px;
   }
-  @media (min-width:640px){
-    :root { --keypad-switch-font-size:16px; --keypad-switch-scale:1.12; }
+  input[type="text"] { padding: 8px 4px; }
+}
+@media (min-width: 480px) {
+  :root {
+    --count-font-size: 14px; --count-padding-y: 3px; --count-padding-x: 12px;
+    --keypad-switch-font-size: 15px; --keypad-switch-scale: 1.06;
   }
-  @media (min-width:840px){
-    :root { --keypad-switch-font-size:16px; --keypad-switch-scale:1.16; }
+}
+@media (min-width: 640px) {
+  :root {
+    --count-font-size: 15px; --count-padding-y: 4px; --count-padding-x: 14px;
+    --keypad-switch-font-size: 16px; --keypad-switch-scale: 1.12;
   }
-  @media (min-width:1024px){
-    :root { --keypad-switch-font-size:17px; --keypad-switch-scale:1.20; }
+}
+@media (min-width: 840px) {
+  :root {
+    --count-font-size: 16px; --count-padding-y: 5px; --count-padding-x: 16px;
+    --keypad-switch-font-size: 16px; --keypad-switch-scale: 1.16;
   }
-  @media (min-width:1280px){
-    :root { --keypad-switch-font-size:18px; --keypad-switch-scale:1.25; }
+}
+@media (min-width: 1024px) {
+  :root {
+    --count-font-size: 17px; --count-padding-y: 6px; --count-padding-x: 18px;
+    --keypad-switch-font-size: 17px; --keypad-switch-scale: 1.20;
   }
-    .btn {
-      padding:12px 14px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#fff;
-      cursor:pointer;
-      touch-action:manipulation;
-    }
-    .btn.primary {
-      background:#1d4ed8;
-      border-color:#1d4ed8;
-      color:#fff;
-    }
-    .btn:active { transform:translateY(1px); }
-    .tiny {
-      font-size:12px;
-      color:#666;
-    }
+}
+@media (min-width: 1280px) {
+  :root {
+    --count-font-size: 18px; --count-padding-y: 7px; --count-padding-x: 20px;
+    --keypad-switch-font-size: 18px; --keypad-switch-scale: 1.25;
+  }
+}
 
-    /* Status */
-    .status {
-      margin-top:10px;
-      padding:10px 12px;
-      border-radius:10px;
-      font-size:14px;
-      border:1px solid var(--line);
-    }
-    .ok {
-      background:#e8f5e9;
-      color:var(--ok);
-      border-color:#c8e6c9;
-    }
-    .warn {
-      background:#fff8e1;
-      color:var(--warn);
-      border-color:#ffe0b2;
-    }
-    .err {
-      background:#ffebee;
-      color:var(--err);
-      border-color:#ffcdd2;
-    }
-    .errorlist {
-      margin:10px 0 0;
-      padding:10px 0 10px 24px;
-    }
-    /* Reserved error area (min-height to prevent keypad jump) */
-    .tiny.err {
-      display:block;
-      /* remove inherited red background until errors exist */
-      background:transparent;
-      border:none;
-      padding:0;
-    }
-    .tiny.err:not(:empty) {
-      background:#ffebee;
-      /*border:1px solid #ffcdd2;*/
-      /*border-radius:8px;*/
-      padding:6px 8px;
-      margin: 5px 0;
-    }
-  .tiny.err:empty { visibility:hidden; }
-    .tiny.err ul.errorlist {
-      margin:0;
-      padding:0 0 0 20px;
-    }
-    .errorRow {
-      position:relative;
-      display:block;
-      /* min-height removed per request; area collapses when empty */
-      /* padding-right removed (Clear button moved to actionRow) */
-    }
-    .btn-clear-line {
-      position:absolute;
-      top:6px;
-      right:0;
-      padding:6px 12px;
-      font-size:12px;
-      border-radius:8px;
-      background:linear-gradient(#fff5f5,#ffe4e6);
-      border:1px solid #fecdd3;
-      color:#b91c1c;
-      font-weight:600;
-    }
-    .btn-clear-line:hover { background:linear-gradient(#fff1f2,#ffd9de); }
-    .btn-clear-line:active { background:#fecdd3; }
-    .btn-check-line {
-  padding:var(--check-btn-padding-y) var(--check-btn-padding-x);
-  font-size:var(--check-btn-font-size);
-      line-height:1.1;
-  border-radius:var(--check-btn-radius);
-      border:1px solid var(--line);
-      background:#fff;
-      cursor:pointer;
-      transition:background .18s,border-color .18s,color .18s;
-    }
-  /* Row for validate + clear buttons */
-  .actionRow{display:flex;align-items:center;gap:12px;margin-top:6px;}
-  .actionRow .btn-clear-line{position:static;margin-left:auto;top:auto;right:auto;}
-    .btn-check-line:disabled { opacity:.45; cursor:not-allowed; }
-  .btn-check-line:not(:disabled) { background:#166534; border-color:#166534; color:#fff; }
-  .btn-check-line:not(:disabled):hover { background:#14532d; border-color:#14532d; color:#fff; }
-  .btn-check-line:not(:disabled):active { background:#0f3f22; border-color:#0f3f22; color:#fff; }
-  /* Responsive sizing for validate buttons */
-  @media (min-width:480px){ :root { --check-btn-font-size:13px; --check-btn-padding-y:7px; --check-btn-padding-x:14px; } }
-  @media (min-width:640px){ :root { --check-btn-font-size:14px; --check-btn-padding-y:8px; --check-btn-padding-x:16px; } }
-  @media (min-width:840px){ :root { --check-btn-font-size:15px; --check-btn-padding-y:9px; --check-btn-padding-x:18px; --check-btn-radius:9px; } }
-  @media (min-width:1024px){ :root { --check-btn-font-size:15.5px; --check-btn-padding-y:10px; --check-btn-padding-x:20px; --check-btn-radius:10px; } }
-  @media (min-width:1280px){ :root { --check-btn-font-size:16px; --check-btn-padding-y:11px; --check-btn-padding-x:22px; --check-btn-radius:11px; } }
+/* Validateボタンの段階的スケール */
+@media (min-width: 480px)  {
+  :root { --check-btn-font-size: 13px; --check-btn-padding-y: 7px; --check-btn-padding-x: 14px; }
+}
+@media (min-width: 640px)  {
+  :root { --check-btn-font-size: 14px; --check-btn-padding-y: 8px; --check-btn-padding-x: 16px; }
+}
+@media (min-width: 840px)  {
+  :root { --check-btn-font-size: 15px; --check-btn-padding-y: 9px; --check-btn-padding-x: 18px; --check-btn-radius: 9px; }
+}
+@media (min-width: 1024px) {
+  :root { --check-btn-font-size: 15.5px; --check-btn-padding-y: 10px; --check-btn-padding-x: 20px; --check-btn-radius: 10px; }
+}
+@media (min-width: 1280px) {
+  :root { --check-btn-font-size: 16px; --check-btn-padding-y: 11px; --check-btn-padding-x: 22px; --check-btn-radius: 11px; }
+}
 
-    /* Error list overrides (local) */
-    .tiny.err .errorlist {
-      list-style:disc;
-      margin:0;
-      padding:0 0 0 18px; /* indent bullets */
-      font-size:12px;
-      color:var(--err);
-      line-height:1.35;
-    }
-    .tiny.err .errorlist li {
-      margin:2px 0;
-      padding:0;
-      list-style:disc;
-      word-break:break-word;
-    }
-    /* When validation passes, ensure empty container stays hidden but space reserved */
-    .tiny.err:empty { visibility:hidden; }
+/* 入力/サンプルの拡大 */
+@media (min-width: 600px) {
+  :root {
+    --input-font-size: 20px;
+    --key-min-height: 42px;
+    --error-slot-min-height: 60px;
+  }
+}
+@media (min-width: 900px) {
+  :root {
+    --input-font-size: 24px;
+    --sample-pre-font-size: 20px;
+    --sample-code-font-size: 20px;
+    --sample-code-letter-spacing: 4px;
+    --sample-note-font-size: 12px;
+    --key-min-height: 40px;
+    --error-slot-min-height: 72px;
+  }
+  .sample-box pre { padding: 12px 14px; }
+}
 
-    /* Keypad */
-    .keypad {
-      position:sticky;
-      bottom:0;
-      background:var(--keypad-bg);
-      border:1px solid var(--line);
-      border-radius:0;
-      padding:4px;
-      margin-top:12px;
-      box-shadow:none;
-      z-index:10;
-      transition:transform .28s ease, opacity .28s ease;
-    }
-    .keypad.hide {
-      pointer-events:none;
-      opacity:0;
-      transform:translateY(12px);
-    }
-    .keys {
-      display:grid;
-      grid-template-columns:repeat(10,1fr);
-      gap:0;
-    }
-    .break {
-      grid-column:1 / -1;
-      height:0;
-    }
-    .key {
-      min-height:var(--key-min-height);
-      border:1px solid var(--line);
-      border-radius:0;
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-family:var(--mono);
-      font-size:18px;
-      font-weight:500;
-      user-select:none;
-      cursor:pointer;
-      touch-action:manipulation;
-      position:relative;
-      box-shadow:none;
-      transition:background .12s;
-    }
-    .key:hover { background:#f1f5f9; }
-    .key:active { background:#e2e8f0; }
-    .key:focus-visible {
-      outline:2px solid var(--focus);
-      outline-offset:2px;
-    }
-    .key[data-action] {
-      font-size:14px;
-      font-weight:600;
-      letter-spacing:.5px;
-    }
-  .key[data-action=clearL1], .key[data-action=clearL2], .key[data-action=back] {
-      background:linear-gradient(#fff5f5,#ffe4e6);
-      border-color:#fecdd3;
-      color:#b91c1c;
-    }
-  .key[data-action=clearL1]:hover, .key[data-action=clearL2]:hover, .key[data-action=back]:hover {
-      background:linear-gradient(#fff1f2,#ffd9de);
-    }
-  .key[data-action=clearL1]:active, .key[data-action=clearL2]:active, .key[data-action=back]:active {
-      background:#fecdd3;
-    }
-    .key[data-action=fillpad] {
-      background:linear-gradient(#e8f5e9,#d0f1d4);
-      border-color:#b2e2b8;
-      color:#1b5e20;
-    }
-    .key[data-action=fillpad]:hover {
-      background:linear-gradient(#e1f3e3,#c4eac9);
-    }
-    .key[data-action=fillpad]:active { background:#b2e2b8; }
-    .key[data-action=lt] {
-      background:linear-gradient(#e8f5e9,#d0f1d4);
-      border-color:#b2e2b8;
-      color:#1b5e20;
-    }
-    .key[data-action=lt]:hover { background:linear-gradient(#e1f3e3,#c4eac9); }
-    .key[data-action=lt]:active { background:#b2e2b8; }
-    .key[data-action=clear] {
-      background:linear-gradient(#fefce8,#fef9c3);
-      border-color:#fde68a;
-      color:#92400e;
-    }
-    .key[data-action=clear]:hover {
-      background:linear-gradient(#fef9d8,#fef3a8);
-    }
-    .key[data-action=clear]:active { background:#fde68a; }
-    @media (hover:none) { .key:hover { background:linear-gradient(#ffffff,#f8fafc); } }
-  /* Bootstrap Icons (inline SVG) サイズ調整 */
-  .key svg.bi { width:1.4em; height:1.4em; display:block; }
-  .key--span2 { grid-column:span 2; }
-  .key--span3 { grid-column:span 3; }
-  .key--span4 { grid-column:span 4; }
-  .key--span10 { grid-column:1 / -1; }
-  .key.wide { grid-column:span 2; }
-  .key.widewide { grid-column:span 4; }
-
-    /* Sample box */
-    .sample-box {
-      margin-top:0;
-      /*padding:12px;*/
-      /*border:1px dashed var(--line);*/
-      /*border-radius:12px;*/
-      /*background:#f0f8ff;*/
-      font-size:13px;
-      color:#1e3a8a;
-    }
-    .sample-box h2 {
-      margin:0 0 6px;
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.5px;
-      color:#1e3a8a;
-    }
-    .sample-box__head {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-    .sample-box__head .btn {
-      padding:6px 10px;
-      font-size:12px;
-      line-height:1;
-      border-radius:8px;
-    }
-    .sample-note {
-      margin:4px 0 4px 0;
-      font-size:var(--sample-note-font-size);
-      color:#475569;
-      line-height: 0.9rem;
-    }
-    .monobox {
-      font-family:var(--mono);
-      font-variant-numeric:slashed-zero;
-      background:#0f172a;
-      color:#e2e8f0;
-      border:1px solid #1e293b;
-      border-radius:10px;
-      padding:10px 12px;
-      white-space:pre;
-      overflow-x:auto;
-      margin-top:8px;
-    }
-    .sample-box pre {
-      margin:6px 0; font:var(--sample-pre-font-size)/1.15 var(--mono); background:#0f172a; color:#e2e8f0;
-      padding:10px 12px; border-radius:10px; overflow-x:auto;
-    }
-    .sample-box code {
-      display:block;
-      white-space:pre;
-      font-family:var(--mono);
-      font-size:var(--sample-code-font-size);
-      letter-spacing:var(--sample-code-letter-spacing);
-      min-width:44ch;
-    }
-    /* Moved sampleBoxBody (no longer inside .sample-box) needs its own styling */
-    #sampleBoxBody pre {
-      margin:6px 0; font:var(--sample-pre-font-size)/1.15 var(--mono); background:#0f172a; color:#e2e8f0;
-      padding:10px 12px; border-radius:10px; overflow-x:auto;
-    }
-    #sampleBoxBody code { display:block; white-space:pre; font-family:var(--mono); font-size:var(--sample-code-font-size); letter-spacing:var(--sample-code-letter-spacing); min-width:44ch; }
-    /* Line2 sample styling */
-    #sampleBoxBody2 pre {
-      margin:6px 0; font:var(--sample-pre-font-size)/1.15 var(--mono); background:#0f172a; color:#e2e8f0;
-      padding:10px 12px; border-radius:10px; overflow-x:auto;
-    }
-    #sampleBoxBody2 code { display:block; white-space:pre; font-family:var(--mono); font-size:var(--sample-code-font-size); letter-spacing:var(--sample-code-letter-spacing); min-width:44ch; }
-
-    /* Media queries: inputs & sample scaling */
-  @media (max-width:599px) { :root { --input-font-size:16px; --sample-note-font-size:10.5px; --sample-code-font-size:13px; --sample-code-letter-spacing:.25px; --key-min-height:44px; --error-slot-min-height:52px; } }
-  @media (max-width:430px) { :root { --input-font-size:15px; --mrz-letter-spacing:0; --sample-code-font-size:13px; --sample-code-letter-spacing:0; --sample-note-font-size:10px; --key-min-height:46px; --error-slot-min-height:50px; } input[type=text]{padding:10px 6px;} }
-  @media (max-width:380px) { :root { --input-font-size:13px; --mrz-letter-spacing:0; --sample-code-font-size:13px; --sample-code-letter-spacing:0; --sample-note-font-size:9.5px; --key-min-height:36px; --error-slot-min-height:48px; } input[type=text]{padding:8px 4px;} }
-  @media (min-width:600px) { :root { --input-font-size:20px; --key-min-height:42px; --error-slot-min-height:60px; } }
-  @media (min-width:900px) { :root { --input-font-size:24px; --sample-pre-font-size:20px; --sample-code-font-size:20px; --sample-code-letter-spacing:4px; --sample-note-font-size:12px; --key-min-height:40px; --error-slot-min-height:72px; } .sample-box pre{padding:12px 14px;} }
-    @media (prefers-reduced-motion:reduce) { .btn:active, .key:active { transform:none; } }
+/* アクセシビリティ */
+@media (prefers-reduced-motion: reduce) {
+  .btn:active,
+  .key:active { transform: none; }
+}
   </style>
 </head>
 <body>
